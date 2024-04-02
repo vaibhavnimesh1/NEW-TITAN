@@ -2,12 +2,29 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { useData } from "../context/context";
 import { dataIncome } from "../constant/constant";
-import "../App.css"
+import "../App.css";
 
 const RTI = ({ isRTI, setIsRTI }) => {
+  const [incomeData, setIncomeData] = useState(dataIncome);
   const { clientData, startDate, startYear } = useData();
 
-  // const [incomeData, setIncomeData] = useState(dataIncome);
+  const [PrevYearState, setPrevYearState] = useState(false);
+  const [totalIncome, setTotalIncome] = useState(0);
+  console.log(totalIncome);
+
+  const togglePrevYearState = () => setPrevYearState(!PrevYearState);
+
+  const handleIncomeChange = (id, value) => {
+    const updatedIncomeTotal = incomeData.map((item) =>
+      id === item.id ? { ...item, amount: parseFloat(value) || 0 } : item
+    );
+    setIncomeData(updatedIncomeTotal);
+
+    setTotalIncome(
+      updatedIncomeTotal.reduce((acc, curr) => acc + curr),
+      0
+    );
+  };
 
   console.log("Table");
   return (
@@ -71,29 +88,71 @@ const RTI = ({ isRTI, setIsRTI }) => {
 
               <div className="col">
                 {/* income start */}
-                <table className="col-12">
-                  <tr className=" col-12">
-                    <th className=" col-4" colSpan={2}>Income</th>
-                    <th className=" col-4">{format(startYear, "yyyy")}</th>
-                    <th className=" col-4">2023</th>
-                  </tr>
-
+                <table className="col-12 border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="id" style={{ width: "50px" }}>
+                        ID
+                      </th>
+                      <th className="col-6 ">Income</th>
+                      <th className="col-3 ">{format(startYear, "yyyy")}</th>
+                      {PrevYearState ? <th className="col-3 ">2022</th> : ""}
+                    </tr>
+                  </thead>
                   <tbody>
-                    <tr>
-                      <td>af</td>
-                      <td>gha</td>
-                      <td>gha</td>
-                      <td>gha</td>
-                    </tr>
-                    <tr>
-                      <td>af</td>
-                      {/* <td>af</td> */}
-                      <td>gha</td>
-                      <td>gha</td>
-                    </tr>
+                    {incomeData?.map((item) => (
+                      <tr key={item.id}>
+                        <td className="number" style={{ width: "50px" }}>
+                          {item.id}
+                        </td>
+                        <td className=" border  border-collapse">
+                          {item.description}
+                        </td>
+                        <td className=" border  border-collapse">
+                          <input
+                            type="number"
+                            value={item.amount}
+                            placeholder="..."
+                            onChange={(e) =>
+                              handleIncomeChange(item.id, e.target.value)
+                            }
+                          />
+                        </td>
+                        {PrevYearState ? (
+                          <td className=" border  border-collapse">Content</td>
+                        ) : (
+                          ""
+                        )}{" "}
+                      </tr>
+                    ))}
                   </tbody>
+
+                  <tfoot>
+                    <tr>
+                      <td colSpan={2}>Total</td>
+                      <td>{totalIncome}</td>
+                      {PrevYearState && <td>54</td>}
+                    </tr>
+                  </tfoot>
                 </table>
-                {/* income start */}
+                {/* income end */}
+              </div>
+
+              <div className="d-flex gap-2 mt-5">
+                <button
+                  className="btn bg-success py-0"
+                  // onClick={handleSubmission}
+                >
+                  Submit Data
+                </button>
+                <button
+                  className="btn bg-warning py-0"
+                  onClick={togglePrevYearState}
+                >
+                  {PrevYearState
+                    ? "Hide Previous Year Data"
+                    : "Show Previous Year Data"}
+                </button>
               </div>
             </div>
           </div>

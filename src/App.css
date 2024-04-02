@@ -61,7 +61,7 @@ body {
 }
 
 .upper th,
-.upper td{
+.upper td {
   border: 1px solid black;
   /* border-radius: ; */
   /* padding: 0!important; */
@@ -95,7 +95,6 @@ textarea {
   min-height: 100% !important;
   padding: 10px;
 }
-
 
 /* .add-section  {
   background: red;
@@ -151,7 +150,7 @@ tfoot tr td {
 .rti-body tr {
   height: 30px;
 }
-.rti-body tr td{
+.rti-body tr td {
   /* background: ; */
   border: 1px solid black;
 }
@@ -176,7 +175,30 @@ tfoot tr td {
   border: none;
   width: 0;
 }
-table{
-  border:  0px solid black;
-  border: 1px 0 1px 1px  ;
+table {
+  border: 1px solid grey;
+}
+
+th {
+  padding: 5px 10px;
+  border: 1px solid grey;
+  background: #dadadada;
+}
+td {
+  padding: 5px 10px;
+  border: 1px solid grey;
+  font-size: 12px;
+  padding: 0;
+  /* text-align: left; */
+}
+
+.id {
+  width: 50px !important;
+}
+
+input{
+  width: 100%;
+  height: 100%;
+  outline: none;
+  
 }
