@@ -22,13 +22,13 @@ export const dataDeduction = [
   { id: "D7", description: "Interest Deduction", amount: "" },
   { id: "D8", description: "Dividend Deduction", amount: "" },
   { id: "D9", description: "Gifts or Donations", amount: "" },
-  {
-    id: "D10",
-    description: "Attributed Personal Services income",
-    amount: "",
-  },
-  { id: "D12", description: "Personal Superannuation ", amount: "" },
-  { id: "D15", description: "Other Deductions", amount: "" },
+  // {
+  //   id: "D10",
+  //   description: "Attributed Personal Services income",
+  //   amount: "",
+  // },
+  // { id: "D12", description: "Personal Superannuation ", amount: "" },
+  // { id: "D15", description: "Other Deductions", amount: "" },
 ];
 
 export const dataPlus = [

@@ -1,32 +1,72 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { useData } from "../context/context";
-import { dataIncome } from "../constant/constant";
+import { dataDeduction, dataIncome } from "../constant/constant";
 import "../App.css";
 
 const RTI = ({ isRTI, setIsRTI }) => {
-  const [incomeData, setIncomeData] = useState(dataIncome);
   const { clientData, startDate, startYear } = useData();
+  const [incomeData, setIncomeData] = useState(dataIncome);
+  const [deductionData, setDeductionData] = useState(dataDeduction);
+  
 
+  // console.log(deductionData);
   const [PrevYearState, setPrevYearState] = useState(false);
   const [totalIncome, setTotalIncome] = useState(0);
-  console.log(totalIncome);
 
+  const [totalDeduction, setTotalDeduction] = useState(0);
   const togglePrevYearState = () => setPrevYearState(!PrevYearState);
 
   const handleIncomeChange = (id, value) => {
-    const updatedIncomeTotal = incomeData.map((item) =>
-      id === item.id ? { ...item, amount: parseFloat(value) || 0 } : item
+    const updatedIncomeTotal = incomeData?.map((item) =>
+      item.id === id ? { ...item, amount: value || 0 } : item
     );
     setIncomeData(updatedIncomeTotal);
 
-    setTotalIncome(
-      updatedIncomeTotal.reduce((acc, curr) => acc + curr),
+    const incomeTotal = updatedIncomeTotal.reduce(
+      (acc, curr) => acc + parseFloat(curr.amount || 0),
       0
     );
+    setTotalIncome(incomeTotal);
+  };
+  const handleDeductionChange = (id, value) => {
+    const updatedDeduction = deductionData?.map((item) =>
+      item.id === id ? { ...item, amount: value || 0 } : item
+    );
+    setDeductionData(updatedDeduction);
+
+    const deductionTotal = updatedDeduction?.reduce(
+      (acc, curr) => acc + parseFloat(curr.amount || 0),
+      0
+    );
+    setTotalDeduction(deductionTotal);
   };
 
-  console.log("Table");
+  const taxableIncome = totalDeduction + totalIncome;
+
+  const handleSubmission = () => {
+    const dataStore = {
+      Year: startYear.getFullYear(),
+      data: {
+        incomeData,
+        deductionData,
+      },
+    };
+    const existingData = JSON.parse(localStorage.getItem("RTI_DATA")) || [];
+
+    const index = existingData.findIndex(
+      (item) => item.Year === startYear.getFullYear()
+    );
+
+    if (index === -1) {
+      existingData.push(dataStore);
+    } else {
+      existingData[index] = dataStore;
+    }
+    localStorage.setItem("RTI_DATA", JSON.stringify(existingData));
+    alert("Data Submitted Successfully!!!");
+  };
+
   return (
     <div className="row col-12 mt-5 lower bg-light py-4 px-2 ">
       <div
@@ -127,21 +167,73 @@ const RTI = ({ isRTI, setIsRTI }) => {
                     ))}
                   </tbody>
 
+                  {/* <tfoot>
+                    <tr>
+                      <td colSpan={2}>Taxable Income</td>
+                      <td>{totalIncome}</td>
+                      {PrevYearState && <td>54</td>}
+                    </tr>
+                  </tfoot> */}
+                </table>
+                {/* income end */}
+
+                {/* deduction table */}
+                <table className="col-12 border-collapse mt-4">
+                  <thead>
+                    <tr>
+                      <th className="id" style={{ width: "50px" }}>
+                        ID
+                      </th>
+                      <th className="col-6 ">Deduction</th>
+                      <th className="col-3 ">{format(startYear, "yyyy")}</th>
+                      {PrevYearState ? <th className="col-3 ">2022</th> : ""}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {deductionData?.map((item) => (
+                      <tr key={item.id}>
+                        <td className="number" style={{ width: "50px" }}>
+                          {item.id}
+                        </td>
+                        <td className=" border  border-collapse">
+                          {item?.description}
+                        </td>
+                        <td className=" border  border-collapse">
+                          <input
+                            type="number"
+                            value={item.amount}
+                            placeholder="..."
+                            onChange={(e) =>
+                              handleDeductionChange(item.id, e.target.value)
+                            }
+                          />
+                        </td>
+                        {PrevYearState ? (
+                          <td className=" border  border-collapse">Content</td>
+                        ) : (
+                          ""
+                        )}{" "}
+                      </tr>
+                    ))}
+                  </tbody>
+
                   <tfoot>
                     <tr>
-                      <td colSpan={2}>Total</td>
-                      <td>{totalIncome}</td>
+                      <td colSpan={2} className=" fs-5 ">
+                        Total
+                      </td>
+                      <td>{taxableIncome.toFixed(2)}</td>
                       {PrevYearState && <td>54</td>}
                     </tr>
                   </tfoot>
                 </table>
-                {/* income end */}
+                {/* deduction table */}
               </div>
 
               <div className="d-flex gap-2 mt-5">
                 <button
                   className="btn bg-success py-0"
-                  // onClick={handleSubmission}
+                  onClick={handleSubmission}
                 >
                   Submit Data
                 </button>

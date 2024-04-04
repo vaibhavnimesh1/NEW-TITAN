@@ -16,7 +16,7 @@ const Context = ({ children }) => {
     Year: "",
     Date: "",
   });
-  console.log("Year ", startYear);
+  // console.log("Year ", startYear.getFullYear());
 
   return (
     <DataContext.Provider

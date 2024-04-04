@@ -10,6 +10,7 @@ import RTI from "./components/RTI";
 
 const HeroPage = () => {
   const { total, clientShareTotal } = useData();
+  // const yera = new date().getFullYear()
 
   const {
     startYear,
@@ -19,9 +20,7 @@ const HeroPage = () => {
     clientData,
     setClientData,
   } = useData();
-  console.log(startYear);
-
-  // console.log(clientData);
+  console.log("year in hero ", startYear);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isInterview, setIsInterview] = useState(false);
@@ -56,11 +55,14 @@ const HeroPage = () => {
 
     ["Total", " ", total, clientShareTotal],
   ];
-
+const handleStartDate=(startYear)=>{
+  setStartYear(new Date(startYear))
+  // console.log();
+}
   return (
     <>
       <div className="container position-relative">
-        <div className="row mt-5">
+        <div className="row mt-2">
           <h1>Client Profile</h1>
 
           <p>
@@ -144,11 +146,12 @@ const HeroPage = () => {
                       Year
                       <span className="">
                         <ReactDatePicker
+                          // defaultValue={startYear}
+                          value={startYear}
                           selected={startYear}
-                          onChange={(date) => setStartYear(date)}
+                          onChange={(startYear) =>handleStartDate(startYear)}
                           showYearPicker
                           dateFormat="yyyy"
-                          value={startYear}
                         />
                       </span>
                     </li>
@@ -186,9 +189,13 @@ const HeroPage = () => {
         {isInterview ? (
           <Interview
             isInterview={isInterview}
-            setIsInterview={setIsInterview}/>) : ("")}
-        </div>
-      </>
+            setIsInterview={setIsInterview}
+          />
+        ) : (
+          ""
+        )}
+      </div>
+    </>
   );
 };
 
