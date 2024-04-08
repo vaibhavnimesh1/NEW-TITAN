@@ -8,19 +8,29 @@ const RTI = ({ isRTI, setIsRTI }) => {
   const { clientData, startDate, startYear } = useData();
   const [incomeData, setIncomeData] = useState(dataIncome);
   const [deductionData, setDeductionData] = useState(dataDeduction);
-  
+
+  // console.log(incomeData?.some((item) => item.amount == ""));
 
   // console.log(deductionData);
   const [PrevYearState, setPrevYearState] = useState(false);
   const [totalIncome, setTotalIncome] = useState(0);
 
   const [totalDeduction, setTotalDeduction] = useState(0);
-  const togglePrevYearState = () => setPrevYearState(!PrevYearState);
+  const [prevYearData, setPrevYearData] = useState([]);
+
+  const togglePrevYearState = () => {
+    if (!prevYearData) {
+      alert("No Previous Data Found!!!!");
+      return;
+    }
+    setPrevYearState(!PrevYearState);
+  };
 
   const handleIncomeChange = (id, value) => {
     const updatedIncomeTotal = incomeData?.map((item) =>
       item.id === id ? { ...item, amount: value || 0 } : item
     );
+
     setIncomeData(updatedIncomeTotal);
 
     const incomeTotal = updatedIncomeTotal.reduce(
@@ -52,6 +62,10 @@ const RTI = ({ isRTI, setIsRTI }) => {
         deductionData,
       },
     };
+    const emptyCondition = dataStore.data?.incomeData?.some(
+      (item) => item.amount != ""
+    );
+    // console.log(dataStore?.data);
     const existingData = JSON.parse(localStorage.getItem("RTI_DATA")) || [];
 
     const index = existingData.findIndex(
@@ -63,9 +77,33 @@ const RTI = ({ isRTI, setIsRTI }) => {
     } else {
       existingData[index] = dataStore;
     }
-    localStorage.setItem("RTI_DATA", JSON.stringify(existingData));
-    alert("Data Submitted Successfully!!!");
+
+    if (emptyCondition) {
+      localStorage.setItem("RTI_DATA", JSON.stringify(existingData));
+      alert("Data Submitted Successfully!!!");
+    } else {
+      alert("Input field are empty");
+    }
   };
+
+  const compareData = () => {
+    const curYear = startYear.getFullYear();
+    const prevYear = curYear - 1;
+
+    const PrevData = JSON.parse(localStorage.getItem("RTI_DATA")) || [];
+    console.log(PrevData);
+
+    if (PrevData) {
+      const l = PrevData.find((item) => item.Year === prevYear);
+      setPrevYearData(l);
+    } else {
+      alert("No Data Found");
+    }
+  };
+
+  useEffect(() => {
+    compareData();
+  }, []);
 
   return (
     <div className="row col-12 mt-5 lower bg-light py-4 px-2 ">
@@ -136,7 +174,11 @@ const RTI = ({ isRTI, setIsRTI }) => {
                       </th>
                       <th className="col-6 ">Income</th>
                       <th className="col-3 ">{format(startYear, "yyyy")}</th>
-                      {PrevYearState ? <th className="col-3 ">2022</th> : ""}
+                      {PrevYearState ? (
+                        <th className="col-3 ">{prevYearData?.Year}</th>
+                      ) : (
+                        ""
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -158,22 +200,16 @@ const RTI = ({ isRTI, setIsRTI }) => {
                             }
                           />
                         </td>
-                        {PrevYearState ? (
-                          <td className=" border  border-collapse">Content</td>
-                        ) : (
-                          ""
-                        )}{" "}
+                        {PrevYearState && (
+                          <td className="border border-collapse">
+                            {prevYearData?.data?.incomeData?.find(
+                              (data) => data.id === item.id
+                            )?.amount || 0}
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
-
-                  {/* <tfoot>
-                    <tr>
-                      <td colSpan={2}>Taxable Income</td>
-                      <td>{totalIncome}</td>
-                      {PrevYearState && <td>54</td>}
-                    </tr>
-                  </tfoot> */}
                 </table>
                 {/* income end */}
 
@@ -186,7 +222,11 @@ const RTI = ({ isRTI, setIsRTI }) => {
                       </th>
                       <th className="col-6 ">Deduction</th>
                       <th className="col-3 ">{format(startYear, "yyyy")}</th>
-                      {PrevYearState ? <th className="col-3 ">2022</th> : ""}
+                      {PrevYearState ? (
+                        <th className="col-3 ">{PrevYearState.Year}</th>
+                      ) : (
+                        ""
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -208,11 +248,13 @@ const RTI = ({ isRTI, setIsRTI }) => {
                             }
                           />
                         </td>
-                        {PrevYearState ? (
-                          <td className=" border  border-collapse">Content</td>
-                        ) : (
-                          ""
-                        )}{" "}
+                        {PrevYearState && (
+                          <td className="border border-collapse">
+                            {prevYearData?.data?.deductionData?.find(
+                              (data) => data.id === item.id
+                            )?.amount || 0}
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -223,7 +265,8 @@ const RTI = ({ isRTI, setIsRTI }) => {
                         Total
                       </td>
                       <td>{taxableIncome.toFixed(2)}</td>
-                      {PrevYearState && <td>54</td>}
+                      {PrevYearState
+                       && <td>54</td>}
                     </tr>
                   </tfoot>
                 </table>

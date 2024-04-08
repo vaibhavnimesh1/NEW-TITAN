@@ -20,7 +20,7 @@ const HeroPage = () => {
     clientData,
     setClientData,
   } = useData();
-  console.log("year in hero ", startYear);
+  // console.log("year in hero ", startYear);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isInterview, setIsInterview] = useState(false);

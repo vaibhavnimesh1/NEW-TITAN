@@ -4,8 +4,7 @@ import { useData } from "../context/context";
 
 const Interview = ({ isInterview, setIsInterview }) => {
   const { setClientShareTotal, total, setTotal, clientShareTotal } = useData();
-  const { clientData, startDate, selectedDate } = useData();
-  console.log(selectedDate);
+  const { clientData, startDate } = useData();
   const [rows, setRows] = useState([["", "", "", ""]]);
 
   const [links, setLinks] = useState([]);
@@ -89,7 +88,6 @@ const Interview = ({ isInterview, setIsInterview }) => {
     }
   };
 
-  console.log(rows);
   return (
     <div className="row col-12 mt-5 lower bg-light py-4 px-2 position-relative  ">
       <div
@@ -132,7 +130,7 @@ const Interview = ({ isInterview, setIsInterview }) => {
                   </tr>
                   <tr className="col-3">
                     <th scope="row">Year :</th>
-                    <td>{format(selectedDate, "yyyy")}</td>
+                    <td>{format(startDate.toString(), "yyyy")}</td>
                     <th>Manager Review</th>
                     <td>No</td>
                   </tr>
