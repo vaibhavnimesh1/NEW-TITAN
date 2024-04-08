@@ -38,20 +38,20 @@ export const dataPlus = [
 ];
 export const dataLessCredit = [
   {
-    id: "LC1",
-    description: "Tax withheld - salary & wage type income",
+    id: "1",
+    description: "Tax withheld - salary ",
     amount: "",
   },
-  { id: "LC2", description: "Arrears tax withheld", amount: "" },
-  { id: "LC3", description: "Foreign Tax Credits", amount: "" },
-  { id: "LC4", description: "TFN Amounts (credits)", amount: "" },
-  { id: "LC5", description: "Franking Tax Offset (refundable)", amount: "" },
-  { id: "LC6", description: "Other Refundable Credits", amount: "" },
+  { id: "2", description: "Arrears tax withheld", amount: "" },
+  { id: "3", description: "Foreign Tax Credits", amount: "" },
+  { id: "4", description: "TFN Amounts (credits)", amount: "" },
+  { id: "5", description: "Franking Tax Offset (refundable)", amount: "" },
+  { id: "6", description: "Other Refundable Credits", amount: "" },
   {
-    id: "LC7",
-    description: "Other Amounts withheld - ABN, Vol, Labour, Foreign",
+    id: "7",
+    description: "Other Amounts withheld ",
     amount: "",
   },
-  { id: "LC8", description: "Baby Bonus Offset (refundable)", amount: "" },
-  { id: "LC9", description: "PAYG Income Tax Instalments", amount: "" },
+  { id: "8", description: "Baby Bonus Offset (refundable)", amount: "" },
+  { id: "9", description: "PAYG Income Tax Instalments", amount: "" },
 ];

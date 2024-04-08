@@ -4,8 +4,8 @@ import { useData } from "../context/context";
 
 const Interview = ({ isInterview, setIsInterview }) => {
   const { setClientShareTotal, total, setTotal, clientShareTotal } = useData();
-  const { clientData, startDate, selectedDate } = useData();
-  console.log(selectedDate);
+  const { clientData, startDate } = useData();
+  // console.log(startDate);
   const [rows, setRows] = useState([["", "", "", ""]]);
 
   const [links, setLinks] = useState([]);
@@ -132,7 +132,7 @@ const Interview = ({ isInterview, setIsInterview }) => {
                   </tr>
                   <tr className="col-3">
                     <th scope="row">Year :</th>
-                    <td>{format(selectedDate, "yyyy")}</td>
+                    <td>{format(startDate, "yyyy")}</td>
                     <th>Manager Review</th>
                     <td>No</td>
                   </tr>
