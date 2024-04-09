@@ -10,12 +10,14 @@ import {
 import "../App.css";
 
 const RTI = ({ isRTI, setIsRTI }) => {
+  const [currentYearData, setCurrentYearData] = useState([]);
+  // console.log(currentYearData);
   const { clientData, startDate, startYear } = useData();
   const [incomeData, setIncomeData] = useState(dataIncome);
   const [deductionData, setDeductionData] = useState(dataDeduction);
   const [lessCreditData, setLessCreditData] = useState(dataLessCredit);
   const [plusData, setPlusData] = useState(dataPlus);
-  console.log(lessCreditData);
+  // console.log(lessCreditData);
   const [perITR, setPerITR] = useState(0);
 
   // console.log(incomeData?.some((item) => item.amount == ""));
@@ -30,6 +32,7 @@ const RTI = ({ isRTI, setIsRTI }) => {
 
   const [totalDeduction, setTotalDeduction] = useState(0);
   const [prevYearData, setPrevYearData] = useState([]);
+  // console.log(prevYearData);
 
   const taxableIncome = totalDeduction + totalIncome;
 
@@ -40,6 +43,10 @@ const RTI = ({ isRTI, setIsRTI }) => {
     const diff = tot - perITR;
     setDifferenceTotal(diff);
   }, [taxableIncome, totalPlus, totalLess, perITR]);
+
+  useEffect(() => {
+    console.log("hh");
+  }, [currentYearData]);
 
   const togglePrevYearState = () => {
     if (!prevYearData) {
@@ -74,7 +81,30 @@ const RTI = ({ isRTI, setIsRTI }) => {
     );
     setTotalDeduction(deductionTotal);
   };
+
+  const handlePrevYearPlusChange = (id, value) => {
+    console.log(id, value);
+    const updatedPlusData = prevYearData?.data?.plusData?.map((item) =>
+      item.id === id ? { ...item, amount: value || 0 } : item
+    );
+    console.log(updatedPlusData);
+    console.log(prevYearData);
+    const data = prevYearData;
+    data.data.plusData = updatedPlusData;
+    console.log(data.data.plusData);
+    setPrevYearData(data);
+    // setPrevYearData((prevData) => ({
+    //   ...prevData,
+    //   data: {
+    //     ...prevData.data,
+    //     plusData: updatedPlusData,
+    //   },
+    // }));
+  };
+
   const handlePlusChange = (id, value) => {
+    console.log(" id ", id);
+    console.log(" value ", value);
     const updatedPlusData = plusData?.map((item) =>
       item.id === id ? { ...item, amount: value || 0 } : item
     );
@@ -86,6 +116,7 @@ const RTI = ({ isRTI, setIsRTI }) => {
     );
     setTotalPlus(lessTotal);
   };
+
   const handleLessCreditChange = (id, value) => {
     const updatedLessCredit = lessCreditData?.map((item) =>
       item.id === id ? { ...item, amount: value || 0 } : item
@@ -111,11 +142,11 @@ const RTI = ({ isRTI, setIsRTI }) => {
         lessCreditData,
       },
     };
-    const emptyCondition = dataStore.data?.incomeData?.some(
-      (item) => item.amount != ""
-    );
-    // console.log(dataStore?.data);
-    const existingData = JSON.parse(localStorage.getItem("RTI_DATA")) || [];
+    // const emptyCondition = dataStore.data?.incomeData?.some(
+    //   (item) => item.amount != ""
+    // );
+    const existingData =
+      JSON.parse(localStorage.getItem("PREV_YEAR_DATA")) || [];
 
     const index = existingData.findIndex(
       (item) => item.Year === startYear.getFullYear()
@@ -127,20 +158,22 @@ const RTI = ({ isRTI, setIsRTI }) => {
       existingData[index] = dataStore;
     }
 
-    if (emptyCondition) {
-      localStorage.setItem("RTI_DATA", JSON.stringify(existingData));
-      alert("Data Submitted Successfully!!!");
-    } else {
-      alert("All input field are empty!!!");
-    }
+    localStorage.setItem("PREV_YEAR_DATA", JSON.stringify(existingData));
+    alert("Data Submitted Successfully!!!");
+    // if (emptyCondition) {
+    // } else {
+    //   alert("All input field are empty!!!");
+    // }
   };
 
   const compareData = () => {
     const curYear = startYear.getFullYear();
     const prevYear = curYear - 1;
 
-    const PrevData = JSON.parse(localStorage.getItem("RTI_DATA")) || [];
-    console.log(PrevData);
+    const PrevData = JSON.parse(localStorage.getItem("PREV_YEAR_DATA")) || [];
+    // console.log(PrevData);
+
+    setCurrentYearData(PrevData);
 
     if (PrevData) {
       const data = PrevData.find((item) => item.Year === prevYear);
@@ -182,6 +215,8 @@ const RTI = ({ isRTI, setIsRTI }) => {
         <div className="container  overflow-y-scroll ">
           <div className="row">
             <div className="col p-0">
+              {/* headinig  */}
+
               <table className="table upper col-12">
                 <thead className="col-3">
                   <tr>
@@ -214,6 +249,7 @@ const RTI = ({ isRTI, setIsRTI }) => {
                   </tr>
                 </tbody>
               </table>
+              {/* headinig  */}
 
               {/* Tax year section */}
 
@@ -235,33 +271,66 @@ const RTI = ({ isRTI, setIsRTI }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {incomeData?.map((item) => (
-                      <tr key={item.id}>
-                        <td className="number" style={{ width: "50px" }}>
-                          {item.id}
-                        </td>
-                        <td className=" border  border-collapse">
-                          {item.description}
-                        </td>
-                        <td className=" border  border-collapse">
-                          <input
-                            type="number"
-                            value={item.amount}
-                            placeholder="..."
-                            onChange={(e) =>
-                              handleIncomeChange(item.id, e.target.value)
-                            }
-                          />
-                        </td>
-                        {PrevYearState && (
-                          <td className="border border-collapse">
-                            {prevYearData?.data?.incomeData?.find(
-                              (data) => data.id === item.id
-                            )?.amount || 0}
-                          </td>
-                        )}
-                      </tr>
-                    ))}
+                    {PrevYearState === true
+                      ? currentYearData
+                          .find((item) => item.Year === startYear.getFullYear())
+                          ?.data?.incomeData?.map((item) => (
+                            <tr key={item.id}>
+                              <td className="number" style={{ width: "50px" }}>
+                                {item.id}
+                              </td>
+                              <td className="border border-collapse">
+                                {item?.description}
+                              </td>
+                              <td className="border border-collapse">
+                                <input
+                                  type="number"
+                                  value={item.amount}
+                                  placeholder="..."
+                                  onChange={(e) =>
+                                    handleDeductionChange(
+                                      item.id,
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </td>
+                              {PrevYearState && (
+                                <td className="border border-collapse">
+                                  {prevYearData?.data?.deductionData?.find(
+                                    (data) => data.id === item.id
+                                  )?.amount || 0}
+                                </td>
+                              )}
+                            </tr>
+                          ))
+                      : incomeData?.map((item) => (
+                          <tr key={item.id}>
+                            <td className="number" style={{ width: "50px" }}>
+                              {item.id}
+                            </td>
+                            <td className="border border-collapse">
+                              {item.description}
+                            </td>
+                            <td className="border border-collapse">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                placeholder="..."
+                                onChange={(e) =>
+                                  handleIncomeChange(item.id, e.target.value)
+                                }
+                              />
+                            </td>
+                            {PrevYearState && (
+                              <td className="border border-collapse">
+                                {prevYearData?.data?.incomeData?.find(
+                                  (data) => data.id === item.id
+                                )?.amount || 0}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
                   </tbody>
                 </table>
                 {/* income end */}
@@ -281,33 +350,66 @@ const RTI = ({ isRTI, setIsRTI }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {deductionData?.map((item) => (
-                      <tr key={item.id}>
-                        <td className="number" style={{ width: "50px" }}>
-                          {item.id}
-                        </td>
-                        <td className=" border  border-collapse">
-                          {item?.description}
-                        </td>
-                        <td className=" border  border-collapse">
-                          <input
-                            type="number"
-                            value={item.amount}
-                            placeholder="..."
-                            onChange={(e) =>
-                              handleDeductionChange(item.id, e.target.value)
-                            }
-                          />
-                        </td>
-                        {PrevYearState && (
-                          <td className="border border-collapse">
-                            {prevYearData?.data?.deductionData?.find(
-                              (data) => data.id === item.id
-                            )?.amount || 0}
-                          </td>
-                        )}
-                      </tr>
-                    ))}
+                    {PrevYearState === true
+                      ? currentYearData
+                          .find((item) => item.Year === startYear.getFullYear())
+                          ?.data?.deductionData?.map((item) => (
+                            <tr key={item.id}>
+                              <td className="number" style={{ width: "50px" }}>
+                                {item.id}
+                              </td>
+                              <td className=" border  border-collapse">
+                                {item?.description}
+                              </td>
+                              <td className=" border  border-collapse">
+                                <input
+                                  type="number"
+                                  value={item.amount}
+                                  placeholder="..."
+                                  onChange={(e) =>
+                                    handleDeductionChange(
+                                      item.id,
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </td>
+                              {PrevYearState && (
+                                <td className="border border-collapse">
+                                  {prevYearData?.data?.deductionData?.find(
+                                    (data) => data.id === item.id
+                                  )?.amount || 0}
+                                </td>
+                              )}
+                            </tr>
+                          ))
+                      : deductionData?.map((item) => (
+                          <tr key={item.id}>
+                            <td className="number" style={{ width: "50px" }}>
+                              {item.id}
+                            </td>
+                            <td className=" border  border-collapse">
+                              {item?.description}
+                            </td>
+                            <td className=" border  border-collapse">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                placeholder="..."
+                                onChange={(e) =>
+                                  handleDeductionChange(item.id, e.target.value)
+                                }
+                              />
+                            </td>
+                            {PrevYearState && (
+                              <td className="border border-collapse">
+                                {prevYearData?.data?.deductionData?.find(
+                                  (data) => data.id === item.id
+                                )?.amount || 0}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
                   </tbody>
 
                   <tfoot>
@@ -340,33 +442,66 @@ const RTI = ({ isRTI, setIsRTI }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {plusData?.map((item) => (
-                      <tr key={item.id}>
-                        <td className="number" style={{ width: "50px" }}>
-                          {item.id}
-                        </td>
-                        <td className=" border  border-collapse">
-                          {item?.description}
-                        </td>
-                        <td className=" border  border-collapse">
-                          <input
-                            type="number"
-                            value={item.amount}
-                            placeholder="..."
-                            onChange={(e) =>
-                              handlePlusChange(item.id, e.target.value)
-                            }
-                          />
-                        </td>
-                        {PrevYearState && (
-                          <td className="border border-collapse">
-                            {prevYearData?.data?.plusData?.find(
-                              (data) => data.id === item.id
-                            )?.amount || 0}
-                          </td>
-                        )}
-                      </tr>
-                    ))}
+                    {PrevYearState === true
+                      ? currentYearData
+                          .find((item) => item.Year === startYear.getFullYear())
+                          .data?.plusData?.map((item) => (
+                            <tr key={item.id}>
+                              <td className="number" style={{ width: "50px" }}>
+                                {item.id}
+                              </td>
+                              <td className=" border  border-collapse">
+                                {item?.description}
+                              </td>
+                              <td className=" border  border-collapse">
+                                <input
+                                  type="number"
+                                  value={item.amount}
+                                  placeholder="..."
+                                  onChange={(e) =>
+                                    handlePrevYearPlusChange(
+                                      item.id,
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </td>
+                              {PrevYearState && (
+                                <td className="border border-collapse">
+                                  {prevYearData?.data?.plusData?.find(
+                                    (data) => data.id === item.id
+                                  )?.amount || 0}
+                                </td>
+                              )}
+                            </tr>
+                          ))
+                      : plusData?.map((item) => (
+                          <tr key={item.id}>
+                            <td className="number" style={{ width: "50px" }}>
+                              {item.id}
+                            </td>
+                            <td className=" border  border-collapse">
+                              {item?.description}
+                            </td>
+                            <td className=" border  border-collapse">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                placeholder="..."
+                                onChange={(e) =>
+                                  handlePlusChange(item.id, e.target.value)
+                                }
+                              />
+                            </td>
+                            {PrevYearState && (
+                              <td className="border border-collapse">
+                                {prevYearData?.data?.plusData?.find(
+                                  (data) => data.id === item.id
+                                )?.amount || 0}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
                   </tbody>
                 </table>
                 {/* plus table */}
@@ -386,75 +521,152 @@ const RTI = ({ isRTI, setIsRTI }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {lessCreditData?.map((item) => (
-                      <tr key={item.id}>
-                        <td className="number" style={{ width: "50px" }}>
-                          {item.id}
-                        </td>
-                        <td className=" border  border-collapse">
-                          {item?.description}
-                        </td>
-                        <td className=" border  border-collapse">
-                          <input
-                            type="number"
-                            value={item.amount}
-                            placeholder="..."
-                            onChange={(e) =>
-                              handleLessCreditChange(item.id, e.target.value)
-                            }
-                          />
-                        </td>
-                        {PrevYearState && (
-                          <td className="border border-collapse">
-                            {prevYearData?.data?.deductionData?.find(
-                              (data) => data.id === item.id
-                            )?.amount || 0}
-                          </td>
-                        )}
-                      </tr>
-                    ))}
+                    {PrevYearState === true
+                      ? currentYearData
+                          .find((item) => item.Year === startYear.getFullYear())
+                          .data?.lessCreditData?.map((item) => (
+                            <tr key={item.id}>
+                              <td className="number" style={{ width: "50px" }}>
+                                {item.id}
+                              </td>
+                              <td className=" border  border-collapse">
+                                {item?.description}
+                              </td>
+                              <td className=" border  border-collapse">
+                                <input
+                                  type="number"
+                                  value={item.amount}
+                                  placeholder="..."
+                                  onChange={(e) =>
+                                    handleLessCreditChange(
+                                      item.id,
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </td>
+                              {PrevYearState && (
+                                <td className="border border-collapse">
+                                  {prevYearData?.data?.plusData?.find(
+                                    (data) => data.id === item.id
+                                  )?.amount || 0}
+                                </td>
+                              )}
+                            </tr>
+                          ))
+                      : lessCreditData?.map((item) => (
+                          <tr key={item.id}>
+                            <td className="number" style={{ width: "50px" }}>
+                              {item.id}
+                            </td>
+                            <td className=" border  border-collapse">
+                              {item?.description}
+                            </td>
+                            <td className=" border  border-collapse">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                placeholder="..."
+                                onChange={(e) =>
+                                  handleLessCreditChange(
+                                    item.id,
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            {PrevYearState && (
+                              <td className="border border-collapse">
+                                {prevYearData?.data?.lessCreditData?.find(
+                                  (data) => data.id === item.id
+                                )?.amount || 0}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
                   </tbody>
-
-                  <tfoot className=" ">
-                    <tr>
-                      <td colSpan={2} className=" fs-5 ">
-                        Estimated Tax Payable/(Refundable)
-                      </td>
-                      <td>{overAllTotal.toFixed(2)}</td>
-                      {PrevYearState && (
-                        <td>{prevYearData?.data?.overAllTotal}</td>
-                      )}
-                    </tr>
-                    <tr>
-                      <td colSpan={2} className=" fs-5 ">
-                        Per ITR
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          value={perITR}
-                          // readOnly={PrevYearState}
-                          onChange={(e) => handlePerITRChange(e.target.value)}
-                        />
-                      </td>
-
-                      {PrevYearState && <td>{prevYearData?.data?.perITR}</td>}
-                    </tr>
-                    <tr>
-                      <td colSpan={2} className=" fs-5  ">
-                        Difference{" "}
-                      </td>
-                      <td>{differenceTotal.toFixed(2)}</td>
-                      {PrevYearState && <td>4</td>}
-                    </tr>
-                  </tfoot>
                 </table>
                 {/* Less Credits Table */}
 
-                {/* TOTAL OVERALL
-                 */}
+                {/* fott */}
 
-                {/* TOTAL OVERALL  */}
+                <table className="col-12">
+                  <tfoot className="">
+                    {prevYearData ? (
+                      <>
+                        <tr>
+                          <td colSpan={2} className="fs-5">
+                            Estimated Tax Payable/(Refundable)
+                          </td>
+                          <td>{overAllTotal.toFixed(2)}</td>
+                          {PrevYearState && (
+                            <td>{prevYearData?.data?.overAllTotal}</td>
+                          )}
+                        </tr>
+                        <tr>
+                          <td colSpan={2} className="fs-5">
+                            Per ITR
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={perITR}
+                              onChange={(e) =>
+                                handlePerITRChange(e.target.value)
+                              }
+                            />
+                          </td>
+                          {PrevYearState && (
+                            <td>{prevYearData?.data?.perITR}</td>
+                          )}
+                        </tr>
+                        <tr>
+                          <td colSpan={2} className="fs-5">
+                            Difference
+                          </td>
+                          <td>{differenceTotal.toFixed(2)}</td>
+                          {PrevYearState && <td>4</td>}
+                        </tr>
+                      </>
+                    ) : (
+                      <>
+                        <tr>
+                          <td colSpan={2} className="fs-5">
+                            Estimated Tax Payable/(Refundable)
+                          </td>
+                          <td>{overAllTotal.toFixed(2)}</td>
+                          {PrevYearState && (
+                            <td>{prevYearData?.data?.overAllTotal}</td>
+                          )}
+                        </tr>
+                        <tr>
+                          <td colSpan={2} className="fs-5">
+                            Per ITR
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={perITR}
+                              onChange={(e) =>
+                                handlePerITRChange(e.target.value)
+                              }
+                            />
+                          </td>
+                          {PrevYearState && (
+                            <td>{prevYearData?.data?.perITR}</td>
+                          )}
+                        </tr>
+                        <tr>
+                          <td colSpan={2} className="fs-5">
+                            Difference
+                          </td>
+                          <td>{differenceTotal.toFixed(2)}</td>
+                          {PrevYearState && <td>4</td>}
+                        </tr>
+                      </>
+                    )}
+                  </tfoot>
+                </table>
               </div>
 
               <div className="d-flex gap-2 mt-5">
