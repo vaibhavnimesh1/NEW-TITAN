@@ -69,18 +69,7 @@ const RTI = ({ isRTI, setIsRTI }) => {
     );
     setTotalIncome(incomeTotal);
   };
-  const handleDeductionChange = (id, value) => {
-    const updatedDeduction = deductionData?.map((item) =>
-      item.id === id ? { ...item, amount: value || 0 } : item
-    );
-    setDeductionData(updatedDeduction);
 
-    const deductionTotal = updatedDeduction?.reduce(
-      (acc, curr) => acc + parseFloat(curr.amount || 0),
-      0
-    );
-    setTotalDeduction(deductionTotal);
-  };
 
   const handlePrevYearPlusChange = (id, value) => {
     console.log(id, value);

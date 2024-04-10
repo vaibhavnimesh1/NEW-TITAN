@@ -7,6 +7,8 @@ import ReactDatePicker from "react-datepicker";
 import { useData } from "./context/context";
 import Interview from "./components/Interview";
 import RTI from "./components/RTI";
+import XYZ from "./components/XYZ";
+
 
 const HeroPage = () => {
   const { total, clientShareTotal } = useData();
@@ -185,7 +187,8 @@ const handleStartDate=(startYear)=>{
             RTI
           </button>
         </div>
-        {isRTI ? <RTI isRTI={isRTI} setIsRTI={setIsRTI} /> : ""}
+        {/* {isRTI ? <RTI isRTI={isRTI} setIsRTI={setIsRTI} /> : ""} */}
+        {isRTI && <XYZ isRTI={isRTI} setIsRTI={setIsRTI} /> }
         {isInterview ? (
           <Interview
             isInterview={isInterview}
