@@ -56,12 +56,23 @@ const RTI = ({ isRTI, setIsRTI }) => {
     setPrevYearState(!PrevYearState);
   };
 
-  const handleIncomeChange = (id, value) => {
-    const updatedIncomeTotal = incomeData?.map((item) =>
-      item.id === id ? { ...item, amount: value || 0 } : item
-    );
+  const handleIncomeChange = (id, value, year) => {
+    const updatedIncomeTotal = currentYearData
+      ?.find((item) => item?.Year === year)
+      ?.data.incomeData?.map((item) =>
+        item.id === id ? { ...item, amount: value || 0 } : item
+      );
 
     setIncomeData(updatedIncomeTotal);
+    console.log(updatedIncomeTotal);
+
+    const yearIndex = currentYearData.findIndex((item) => item?.Year === year);
+
+    if (yearIndex !== -1) {
+      const updatedYearData = [...currentYearData];
+      updatedYearData[yearIndex].data.incomeData = updatedIncomeTotal;
+      setCurrentYearData(updatedYearData);
+    }
 
     const incomeTotal = updatedIncomeTotal.reduce(
       (acc, curr) => acc + parseFloat(curr.amount || 0),
@@ -71,25 +82,25 @@ const RTI = ({ isRTI, setIsRTI }) => {
   };
 
 
-  const handlePrevYearPlusChange = (id, value) => {
-    console.log(id, value);
-    const updatedPlusData = prevYearData?.data?.plusData?.map((item) =>
-      item.id === id ? { ...item, amount: value || 0 } : item
-    );
-    console.log(updatedPlusData);
-    console.log(prevYearData);
-    const data = prevYearData;
-    data.data.plusData = updatedPlusData;
-    console.log(data.data.plusData);
-    setPrevYearData(data);
-    // setPrevYearData((prevData) => ({
-    //   ...prevData,
-    //   data: {
-    //     ...prevData.data,
-    //     plusData: updatedPlusData,
-    //   },
-    // }));
-  };
+  // const handlePrevYearPlusChange = (id, value) => {
+  //   console.log(id, value);
+  //   const updatedPlusData = prevYearData?.data?.plusData?.map((item) =>
+  //     item.id === id ? { ...item, amount: value || 0 } : item
+  //   );
+  //   console.log(updatedPlusData);
+  //   console.log(prevYearData);
+  //   const data = prevYearData;
+  //   data.data.plusData = updatedPlusData;
+  //   console.log(data.data.plusData);
+  //   setPrevYearData(data);
+  //   // setPrevYearData((prevData) => ({
+  //   //   ...prevData,
+  //   //   data: {
+  //   //     ...prevData.data,
+  //   //     plusData: updatedPlusData,
+  //   //   },
+  //   // }));
+  // };
 
   const handlePlusChange = (id, value) => {
     console.log(" id ", id);
@@ -293,7 +304,9 @@ const RTI = ({ isRTI, setIsRTI }) => {
                               )}
                             </tr>
                           ))
-                      : incomeData?.map((item) => (
+                      : currentYearData
+                          .find((item) => item.Year === startYear.getFullYear())
+                          ?.data?.incomeData?.map((item) => (
                           <tr key={item.id}>
                             <td className="number" style={{ width: "50px" }}>
                               {item.id}

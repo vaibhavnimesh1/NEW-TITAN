@@ -9,7 +9,6 @@ import Interview from "./components/Interview";
 import RTI from "./components/RTI";
 import XYZ from "./components/XYZ";
 
-
 const HeroPage = () => {
   const { total, clientShareTotal } = useData();
   // const yera = new date().getFullYear()
@@ -22,7 +21,7 @@ const HeroPage = () => {
     clientData,
     setClientData,
   } = useData();
-  console.log("year in hero ", startYear);
+  // console.log("year in hero ", startYear);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isInterview, setIsInterview] = useState(false);
@@ -57,10 +56,10 @@ const HeroPage = () => {
 
     ["Total", " ", total, clientShareTotal],
   ];
-const handleStartDate=(startYear)=>{
-  setStartYear(new Date(startYear))
-  // console.log();
-}
+  const handleStartDate = (startYear) => {
+    setStartYear(new Date(startYear));
+    // console.log();
+  };
   return (
     <>
       <div className="container position-relative">
@@ -151,7 +150,7 @@ const handleStartDate=(startYear)=>{
                           // defaultValue={startYear}
                           value={startYear}
                           selected={startYear}
-                          onChange={(startYear) =>handleStartDate(startYear)}
+                          onChange={(startYear) => handleStartDate(startYear)}
                           showYearPicker
                           dateFormat="yyyy"
                         />
@@ -188,7 +187,7 @@ const handleStartDate=(startYear)=>{
           </button>
         </div>
         {/* {isRTI ? <RTI isRTI={isRTI} setIsRTI={setIsRTI} /> : ""} */}
-        {isRTI && <XYZ isRTI={isRTI} setIsRTI={setIsRTI} /> }
+        {isRTI && <XYZ isRTI={isRTI} setIsRTI={setIsRTI} />}
         {isInterview ? (
           <Interview
             isInterview={isInterview}
