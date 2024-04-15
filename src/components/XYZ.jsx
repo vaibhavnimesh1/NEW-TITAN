@@ -11,28 +11,36 @@ import "../App.css";
 
 const XYZ = ({ isRTI, setIsRTI }) => {
   const [currentYearData, setCurrentYearData] = useState([]);
+  console.log(currentYearData);
   const { clientData, startDate, startYear } = useData();
   const [incomeData, setIncomeData] = useState(dataIncome);
+  // const [constantData, setconstantData] = useState(dataIncome);
   const [deductionData, setDeductionData] = useState(dataDeduction);
   const [lessCreditData, setLessCreditData] = useState(dataLessCredit);
   const [plusData, setPlusData] = useState(dataPlus);
   const [perITR, setPerITR] = useState(0);
   const [PrevYearState, setPrevYearState] = useState(false);
   const [totalIncome, setTotalIncome] = useState(0);
+  const [totalDeduction, setTotalDeduction] = useState(0);
   const [totalLess, setTotalLess] = useState(0);
   const [totalPlus, setTotalPlus] = useState(0);
   const [overAllTotal, setOverAllTotal] = useState(0);
-  // console.log(overAllTotal);
+  const [isLocalData, setIsLocalData] = useState(true);
   const [differenceTotal, setDifferenceTotal] = useState(0);
-  const [totalDeduction, setTotalDeduction] = useState(0);
   const [prevYearData, setPrevYearData] = useState([]);
-
-  const taxableIncome = totalDeduction + totalIncome;
-  // console.log(taxableIncome, totalDeduction, totalIncome);
   const [overAll, setOverAll] = useState(0);
 
+  const taxableIncome =
+    totalDeduction !== null && totalIncome !== null
+      ? totalDeduction + totalIncome
+      : 0;
+
   const togglePrevYearState = () => {
-    if (!currentYearData) {
+    const isLastYearData = currentYearData.some(
+      (i) => i.Year === startYear.getFullYear() - 1
+    );
+
+    if (isLastYearData == false) {
       alert("No Previous Data Found!!!!");
       return;
     }
@@ -46,29 +54,31 @@ const XYZ = ({ isRTI, setIsRTI }) => {
   };
 
   const handleIncomeChange = (id, value, year) => {
-    console.log(updatedIncomeTotal);
     const updatedIncomeTotal = currentYearData
       ?.find((item) => item?.Year === year)
       ?.data.incomeData?.map((item) =>
         item.id === id ? { ...item, amount: value || 0 } : item
       );
     // console.log(updatedIncomeTotal);
+    if (updatedIncomeTotal == undefined) {
+      const updatedIncomeTotal = incomeData.map((item) =>
+        item.id === id ? { ...item, amount: value || 0 } : item
+      );
+    }
 
     setIncomeData(updatedIncomeTotal);
-    console.log(updatedIncomeTotal);
-    const yearIndex = currentYearData.findIndex((item) => item?.Year === year);
-    console.log(updatedIncomeTotal);
+    const yearIndex = currentYearData?.findIndex((item) => item?.Year === year);
+
     if (yearIndex !== -1) {
       const updatedYearData = [...currentYearData];
       updatedYearData[yearIndex].data.incomeData = updatedIncomeTotal;
       setCurrentYearData(updatedYearData);
     }
-    console.log(updatedIncomeTotal);
+
     const incomeTotal = updatedIncomeTotal?.reduce(
       (acc, curr) => acc + parseFloat(curr.amount || 0),
       0
     );
-    setOverAll(incomeTotal)
     setTotalIncome(incomeTotal);
   };
 
@@ -79,9 +89,15 @@ const XYZ = ({ isRTI, setIsRTI }) => {
         item.id === id ? { ...item, amount: value || 0 } : item
       );
 
-    setDeductionData(updatedIncomeTotal);
+    console.log(updatedIncomeTotal);
+    if (updatedIncomeTotal === undefined) {
+      const updatedIncomeTotal = deductionData.map((item) =>
+        item.id === id ? { ...item, amount: value || 0 } : item
+      );
+    }
 
-    const yearIndex = currentYearData.findIndex((item) => item?.Year === year);
+    setDeductionData(updatedIncomeTotal);
+    const yearIndex = currentYearData?.findIndex((item) => item?.Year === year);
 
     if (yearIndex !== -1) {
       const updatedYearData = [...currentYearData];
@@ -89,11 +105,11 @@ const XYZ = ({ isRTI, setIsRTI }) => {
       setCurrentYearData(updatedYearData);
     }
 
-    const incomeTotal = updatedIncomeTotal.reduce(
+    const incomeTotal = updatedIncomeTotal?.reduce(
       (acc, curr) => acc + parseFloat(curr.amount || 0),
       0
     );
-    setTotalIncome(incomeTotal);
+    setTotalDeduction(incomeTotal);
   };
   const handleLessCreditChange = (id, value, year) => {
     const updatedIncomeTotal = currentYearData
@@ -102,9 +118,15 @@ const XYZ = ({ isRTI, setIsRTI }) => {
         item.id === id ? { ...item, amount: value || 0 } : item
       );
 
-    setLessCreditData(updatedIncomeTotal);
+    console.log(updatedIncomeTotal);
+    if (updatedIncomeTotal === undefined) {
+      const updatedIncomeTotal = lessCreditData.map((item) =>
+        item.id === id ? { ...item, amount: value || 0 } : item
+      );
+    }
 
-    const yearIndex = currentYearData.findIndex((item) => item?.Year === year);
+    setLessCreditData(updatedIncomeTotal);
+    const yearIndex = currentYearData?.findIndex((item) => item?.Year === year);
 
     if (yearIndex !== -1) {
       const updatedYearData = [...currentYearData];
@@ -112,30 +134,18 @@ const XYZ = ({ isRTI, setIsRTI }) => {
       setCurrentYearData(updatedYearData);
     }
 
-    const incomeTotal = currentYearData
-      ?.find((item) => item.Year === startYear.getFullYear())
-      ?.data?.incomeData?.reduce(
-        (acc, curr) => acc + parseFloat(curr.amount || 0),
-        0
-      );
-    setTotalLess(incomeTotal);
+    const incomeTotal = updatedIncomeTotal?.reduce(
+      (acc, curr) => acc + parseFloat(curr.amount || 0),
+      0
+    );
+    setTotalDeduction(incomeTotal);
   };
-
-  useEffect(() => {
-    const tot = taxableIncome + totalPlus + totalLess;
-    setOverAllTotal(tot);
-    const diff = tot - perITR;
-    setDifferenceTotal(diff);
-  }, [taxableIncome, totalPlus, totalLess, perITR, currentYearData, isRTI]);
-
-  useEffect(() => {
-    compareData();
-  }, []);
 
   const handlePerITRChange = (value) => {
     const newValue = parseFloat(value);
     setPerITR(isNaN(newValue) ? "" : newValue);
   };
+
   const handleSubmission = () => {
     const dataStore = {
       Year: startYear.getFullYear(),
@@ -143,12 +153,14 @@ const XYZ = ({ isRTI, setIsRTI }) => {
         incomeData,
         deductionData,
         plusData,
-        perITR,
-        overAllTotal,
         lessCreditData,
+        perITR,
+        differenceTotal,
+        overAllTotal,
       },
     };
 
+    console.log(dataStore);
     const existingData =
       JSON.parse(localStorage.getItem("PREV_YEAR_DATA")) || [];
 
@@ -167,6 +179,7 @@ const XYZ = ({ isRTI, setIsRTI }) => {
   };
 
   const compareData = () => {
+    setconstantData(dataIncome);
     const curYear = startYear.getFullYear();
     const prevYear = curYear - 1;
 
@@ -174,21 +187,116 @@ const XYZ = ({ isRTI, setIsRTI }) => {
     setCurrentYearData(PrevData);
 
     if (PrevData) {
-      const data = PrevData.find((item) => item.Year === prevYear);
       const dat = PrevData.find((item) => item.Year === curYear);
+      const data = PrevData.find((item) => item.Year === prevYear);
+      console.log(dat, data);
+      //   if (dat == undefined) {
+      //     // setIsLocalData(true);
+      //    return
+      //  }
 
       setOverAll(dat?.data?.overAllTotal);
-      console.log(overAll);
-
-      console.log(dat);
       setPrevYearData(data);
     } else {
       alert("No Data Found");
     }
-
-    console.log(prevYearData);
   };
-  console.log(overAll);
+  const handleIncomeChangeDown = (id, value) => {
+    const updatedIncomeTotal = incomeData.map((item) =>
+      item.id === id ? { ...item, amount: value || 0 } : item
+    );
+    console.log(updatedIncomeTotal);
+
+    setIncomeData(updatedIncomeTotal);
+
+    const incomeTotal = updatedIncomeTotal.reduce(
+      (acc, curr) => acc + parseFloat(curr.amount || 0),
+      0
+    );
+    setTotalIncome(incomeTotal);
+  };
+  const handleLessCreditChangeDown = (id, value) => {
+    const updatedIncomeTotal = lessCreditData.map((item) =>
+      item.id === id ? { ...item, amount: value || 0 } : item
+    );
+    console.log(updatedIncomeTotal);
+
+    setLessCreditData(updatedIncomeTotal);
+
+    const incomeTotal = updatedIncomeTotal.reduce(
+      (acc, curr) => acc + parseFloat(curr.amount || 0),
+      0
+    );
+    setTotalLess(incomeTotal);
+  };
+  const handledeductionChangeDown = (id, value) => {
+    const updatedIncomeTotal = deductionData.map((item) =>
+      item.id === id ? { ...item, amount: value || 0 } : item
+    );
+    console.log(updatedIncomeTotal);
+
+    setDeductionData(updatedIncomeTotal);
+
+    const incomeTotal = updatedIncomeTotal.reduce(
+      (acc, curr) => acc + parseFloat(curr.amount || 0),
+      0
+    );
+    setTotalDeduction(incomeTotal);
+  };
+
+  useEffect(() => {
+    // setconstantData(dataIncome);
+    // compareData();
+    const curYear = startYear.getFullYear();
+
+    const PrevData = JSON.parse(localStorage.getItem("PREV_YEAR_DATA")) || [];
+    setCurrentYearData(PrevData);
+    const dat = PrevData.find((item) => item.Year === curYear);
+    if (!dat) {
+      setIsLocalData(false);
+    } else {
+      const incomeTotal = PrevData?.find(
+        (i) => i.Year === curYear
+      )?.data?.incomeData?.reduce(
+        (acc, curr) => acc + parseFloat(curr.amount || 0),
+        0
+      );
+      const deductionTotal = PrevData?.find(
+        (i) => i.Year === curYear
+      )?.data?.deductionData?.reduce(
+        (acc, curr) => acc + parseFloat(curr.amount || 0),
+        0
+      );
+      const lessTotal = PrevData?.find(
+        (i) => i.Year === curYear
+      )?.data?.lessCreditData?.reduce(
+        (acc, curr) => acc + parseFloat(curr.amount || 0),
+        0
+      );
+      // console.log(lessTotal);
+
+      setTotalIncome(incomeTotal);
+      setTotalDeduction(deductionTotal);
+      setTotalLess(lessTotal);
+      setOverAllTotal(deductionTotal + incomeTotal + lessTotal);
+    }
+  }, []);
+  useEffect(() => {
+    const tot = taxableIncome + totalPlus + totalLess;
+    setOverAllTotal(tot);
+    const diff = tot - perITR;
+    setDifferenceTotal(diff);
+    setOverAllTotal(totalDeduction + totalIncome + totalLess);
+  }, [
+    taxableIncome,
+    totalPlus,
+    totalLess,
+    totalDeduction,
+    perITR,
+    currentYearData,
+    isRTI,
+  ]);
+
   return (
     <div className="row col-12 mt-5 lower bg-light py-4 px-2 ">
       <div
@@ -224,15 +332,51 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                       </th>
                       <th className="col-6 ">Income</th>
                       <th className="col-3 ">{format(startYear, "yyyy")}</th>
-                      {PrevYearState === true && (
+                      {PrevYearState ? (
                         <th className="col-3 ">{prevYearData?.Year}</th>
+                      ) : (
+                        ""
                       )}
                     </tr>
                   </thead>
-                  <tbody>
-                    {currentYearData
-                      ?.find((item) => item.Year === startYear.getFullYear())
-                      ?.data?.incomeData?.map((item) => (
+                  {isLocalData ? (
+                    <tbody>
+                      {currentYearData
+                        ?.find((item) => item.Year === startYear.getFullYear())
+                        ?.data?.incomeData?.map((item) => (
+                          <tr key={item.id}>
+                            <td className="number" style={{ width: "50px" }}>
+                              {item.id}
+                            </td>
+                            <td className="border border-collapse">
+                              {item.description}
+                            </td>
+                            <td className="border border-collapse">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                onChange={(e) =>
+                                  handleIncomeChange(
+                                    item.id,
+                                    e.target.value,
+                                    startYear.getFullYear()
+                                  )
+                                }
+                              />
+                            </td>
+                            {PrevYearState && (
+                              <td className="border border-collapse">
+                                {prevYearData?.data?.incomeData?.find(
+                                  (data) => data.id === item.id
+                                )?.amount || 0}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                    </tbody>
+                  ) : (
+                    <tbody>
+                      {incomeData.map((item) => (
                         <tr key={item.id}>
                           <td className="number" style={{ width: "50px" }}>
                             {item.id}
@@ -242,11 +386,10 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                           </td>
                           <td className="border border-collapse">
                             <input
-                              type="text"
+                              type="number"
                               value={item.amount}
-                              placeholder="..."
                               onChange={(e) =>
-                                handleIncomeChange(
+                                handleIncomeChangeDown(
                                   item.id,
                                   e.target.value,
                                   startYear.getFullYear()
@@ -263,7 +406,8 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                           )}
                         </tr>
                       ))}
-                  </tbody>
+                    </tbody>
+                  )}
                 </table>
                 {/* incomeData */}
 
@@ -276,15 +420,51 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                       </th>
                       <th className="col-6 ">Deduction</th>
                       <th className="col-3 ">{format(startYear, "yyyy")}</th>
-                      {PrevYearState === true && (
+                      {PrevYearState ? (
                         <th className="col-3 ">{prevYearData?.Year}</th>
+                      ) : (
+                        ""
                       )}
                     </tr>
                   </thead>
-                  <tbody>
-                    {currentYearData
-                      ?.find((item) => item.Year === startYear.getFullYear())
-                      ?.data?.deductionData?.map((item) => (
+                  {isLocalData ? (
+                    <tbody>
+                      {currentYearData
+                        ?.find((item) => item.Year === startYear.getFullYear())
+                        ?.data?.deductionData?.map((item) => (
+                          <tr key={item.id}>
+                            <td className="number" style={{ width: "50px" }}>
+                              {item.id}
+                            </td>
+                            <td className="border border-collapse">
+                              {item.description}
+                            </td>
+                            <td className="border border-collapse">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                onChange={(e) =>
+                                  handledeductionChange(
+                                    item.id,
+                                    e.target.value,
+                                    startYear.getFullYear()
+                                  )
+                                }
+                              />
+                            </td>
+                            {PrevYearState && (
+                              <td className="border border-collapse">
+                                {prevYearData?.data?.deductionData?.find(
+                                  (data) => data.id === item.id
+                                )?.amount || 0}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                    </tbody>
+                  ) : (
+                    <tbody>
+                      {deductionData.map((item) => (
                         <tr key={item.id}>
                           <td className="number" style={{ width: "50px" }}>
                             {item.id}
@@ -294,11 +474,10 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                           </td>
                           <td className="border border-collapse">
                             <input
-                              type="text"
+                              type="number"
                               value={item.amount}
-                              placeholder="..."
                               onChange={(e) =>
-                                handledeductionChange(
+                                handledeductionChangeDown(
                                   item.id,
                                   e.target.value,
                                   startYear.getFullYear()
@@ -315,7 +494,8 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                           )}
                         </tr>
                       ))}
-                  </tbody>
+                    </tbody>
+                  )}
                   <tfoot>
                     <tr>
                       <td colSpan={2} className=" fs-5 ">
@@ -328,10 +508,11 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                     </tr>
                   </tfoot>
                 </table>
+
                 {/* deductionData */}
 
-                {/* plus table
-                 */}
+                {/* plus table  */}
+
                 {/* <table className="col-12 border-collapse mt-4">
                   <thead>
                     <tr>
@@ -360,7 +541,7 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                             <input
                               type="number"
                               value={item.amount}
-                              placeholder="..."
+                              
                               onChange={(e) =>
                                 handlePlusChange(item.id, e.target.value , startYear.getFullYear())
                               }
@@ -380,23 +561,59 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                 {/* plus table  */}
 
                 {/* Less Credits Table */}
-                <table className="col-12 border-collapse my-4">
+                <table className="col-12 border-collapse">
                   <thead>
                     <tr>
                       <th className="id" style={{ width: "50px" }}>
                         ID
                       </th>
-                      <th className="col-6 ">Less Credit</th>
+                      <th className="col-6 ">less Credit Data</th>
                       <th className="col-3 ">{format(startYear, "yyyy")}</th>
-                      {PrevYearState === true && (
+                      {PrevYearState ? (
                         <th className="col-3 ">{prevYearData?.Year}</th>
+                      ) : (
+                        ""
                       )}
                     </tr>
                   </thead>
-                  <tbody>
-                    {currentYearData
-                      ?.find((item) => item.Year === startYear.getFullYear())
-                      ?.data?.lessCreditData?.map((item) => (
+                  {isLocalData ? (
+                    <tbody>
+                      {currentYearData
+                        ?.find((item) => item.Year === startYear.getFullYear())
+                        ?.data?.lessCreditData?.map((item) => (
+                          <tr key={item.id}>
+                            <td className="number" style={{ width: "50px" }}>
+                              {item.id}
+                            </td>
+                            <td className="border border-collapse">
+                              {item.description}
+                            </td>
+                            <td className="border border-collapse">
+                              <input
+                                type="number"
+                                value={item.amount}
+                                onChange={(e) =>
+                                  handleLessCreditChange(
+                                    item.id,
+                                    e.target.value,
+                                    startYear.getFullYear()
+                                  )
+                                }
+                              />
+                            </td>
+                            {PrevYearState && (
+                              <td className="border border-collapse">
+                                {prevYearData?.data?.lessCreditData?.find(
+                                  (data) => data.id === item.id
+                                )?.amount || 0}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                    </tbody>
+                  ) : (
+                    <tbody>
+                      {lessCreditData.map((item) => (
                         <tr key={item.id}>
                           <td className="number" style={{ width: "50px" }}>
                             {item.id}
@@ -406,11 +623,10 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                           </td>
                           <td className="border border-collapse">
                             <input
-                              type="text"
+                              type="number"
                               value={item.amount}
-                              placeholder="..."
                               onChange={(e) =>
-                                handleLessCreditChange(
+                                handleLessCreditChangeDown(
                                   item.id,
                                   e.target.value,
                                   startYear.getFullYear()
@@ -427,13 +643,8 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                           )}
                         </tr>
                       ))}
-                  </tbody>
-                </table>
-                {/* Less Credits Table */}
-
-                {/* fott */}
-
-                <table className="col-12 my-4 ">
+                    </tbody>
+                  )}
                   <tfoot className="">
                     {
                       <>
@@ -441,8 +652,8 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                           <td colSpan={2} className="fs-5">
                             Estimated Tax Payable/(Refundable)
                           </td>
-                          <td>{overAll}</td>
-                          {/* <td>{ overAllTotal.toFixed(2)}</td> */}
+                          {/* <td>{overAll}</td> */}
+                          <td>{overAllTotal.toFixed(2)}</td>
                           {PrevYearState && (
                             <td>{prevYearData?.data?.overAllTotal}</td>
                           )}
@@ -476,6 +687,13 @@ const XYZ = ({ isRTI, setIsRTI }) => {
                       </>
                     }
                   </tfoot>
+                </table>
+                {/* Less Credits Table */}
+
+                {/* fott */}
+
+                <table className="col-12 my-4 ">
+                 
                 </table>
               </div>
 
